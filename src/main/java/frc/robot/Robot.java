@@ -6,42 +6,28 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
+import frc.robot.subsystems.DriveSubsystem;
 
 public class Robot extends TimedRobot {
-  private PWMSparkMax frontLeftMotor;
-  private PWMSparkMax frontRightMotor;
-  private PWMSparkMax backLeftMotor;
-  private PWMSparkMax backRightMotor;
-
-  private DifferentialDrive robotDrive;
   private XboxController controller;
-
-  private double y_axis_speed;
-  private double x_axis_speed;
+  private DriveSubsystem driveSubsystem;
 
   @Override
   public void robotInit() {
-    frontLeftMotor = new PWMSparkMax(0);
-    frontRightMotor = new PWMSparkMax(1);
-    backLeftMotor = new PWMSparkMax(2);
-    frontRightMotor = new PWMSparkMax(3);
-
-    frontLeftMotor.addFollower(backLeftMotor);
-    frontRightMotor.addFollower(backRightMotor);
-
-    robotDrive = new DifferentialDrive(frontLeftMotor, frontRightMotor);
+    driveSubsystem = new DriveSubsystem();
     controller = new XboxController(0);
-
-    frontRightMotor.setInverted(true);
   }
 
   @Override
   public void teleopPeriodic() {
-    y_axis_speed = -controller.getLeftY() * Constants.MAX_ROBOT_SPEED;
-    x_axis_speed = -controller.getRightX() * Constants.MAX_ROBOT_SPEED;
+    double speed = -controller.getLeftX() * Constants.MAX_ROBOT_SPEED;
+    double turn = -controller.getLeftY() * Constants.MAX_ROBOT_SPEED;
 
-    robotDrive.arcadeDrive(y_axis_speed, x_axis_speed);
+    driveSubsystem.drive(speed, turn);
+  }
+
+  @Override
+  public void autonomousPeriodic() {
+    driveSubsystem.drive(0.3, 0.0);
   }
 }
